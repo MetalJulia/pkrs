@@ -1,7 +1,10 @@
 use crate::ShardManagerContainer;
-use serenity::{client::bridge::gateway::ShardId, framework::standard::{macros::command, CommandResult}};
 use serenity::model::prelude::*;
 use serenity::prelude::*;
+use serenity::{
+    client::bridge::gateway::ShardId,
+    framework::standard::{macros::command, CommandResult},
+};
 
 #[command]
 async fn ping(ctx: &Context, msg: &Message) -> CommandResult {
@@ -25,7 +28,17 @@ async fn ping(ctx: &Context, msg: &Message) -> CommandResult {
         }
     };
     let _ = msg
-        .reply(ctx, &format!("The shard latency is {:?}", runner.latency))
+        .channel_id
+        .say(
+            ctx,
+            &format!(
+                "Pong! The shard latency is `{:?}`",
+                runner.latency.map_or_else(
+                    || { "unavailable".to_string() },
+                    |l| l.as_millis().to_string()
+                )
+            ),
+        )
         .await;
     Ok(())
 }
