@@ -32,7 +32,7 @@ async fn ping(ctx: &Context, msg: &Message) -> CommandResult {
         .say(
             ctx,
             &format!(
-                "Pong! The shard latency is `{:?}`",
+                "Pong! The shard latency is `{}`",
                 runner.latency.map_or_else(
                     || { "unavailable".to_string() },
                     |l| l.as_millis().to_string()
