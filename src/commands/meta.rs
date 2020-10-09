@@ -27,18 +27,14 @@ async fn ping(ctx: &Context, msg: &Message) -> CommandResult {
             return Ok(());
         }
     };
-    let _ = msg
-        .channel_id
-        .say(
-            ctx,
-            &format!(
-                "Pong! The shard latency is `{}`",
-                runner.latency.map_or_else(
-                    || { "unavailable".to_string() },
-                    |l| l.as_millis().to_string()
-                )
-            ),
-        )
-        .await;
+    let reply = match runner.latency {
+        Some(l) => {
+            let l = l.as_millis();
+            format!("Pong! The shard latency is `{}ms`", l)
+        }
+        None => "The shard latency is unavailable.".to_string(),
+    };
+
+    let _ = msg.channel_id.say(ctx, reply).await;
     Ok(())
 }
