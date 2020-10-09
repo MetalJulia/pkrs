@@ -1,0 +1,5 @@
+prefixes:
+  - rpk;
+  - rk;
+token: bleh
+db_conn: postgresql://postgres@localhost/rustypk
