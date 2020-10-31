@@ -5,6 +5,7 @@ use serenity::{
     client::bridge::gateway::ShardId,
     framework::standard::{macros::command, CommandResult},
 };
+use std::time::Instant;
 
 #[command]
 async fn ping(ctx: &Context, msg: &Message) -> CommandResult {
@@ -27,14 +28,14 @@ async fn ping(ctx: &Context, msg: &Message) -> CommandResult {
             return Ok(());
         }
     };
-    let reply = match runner.latency {
-        Some(l) => {
-            let l = l.as_millis();
-            format!("Pong! The shard latency is `{}ms`", l)
-        }
-        None => "The shard latency is unavailable.".to_string(),
-    };
-
-    let _ = msg.channel_id.say(ctx, reply).await;
+    let latency = runner.latency.map_or(None, |l| Some(l.as_millis()));
+    let reply = latency.map_or_else(
+        || "Pong! The shard latency is unavailable".to_string(),
+        |l| format!("Pong! The shard latency is `{}ms`.", l),
+    );
+    let msg_latency_start = Instant::now();
+    let mut msg = msg.channel_id.say(ctx, reply.clone()).await?;
+    let msg_latency = msg_latency_start.elapsed();
+    let _ = msg.edit(&ctx, |m| m.content(format!("{} The message latency is `{}ms`.", reply, msg_latency.as_millis()))).await;
     Ok(())
 }
