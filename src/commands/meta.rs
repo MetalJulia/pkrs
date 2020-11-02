@@ -30,12 +30,21 @@ async fn ping(ctx: &Context, msg: &Message) -> CommandResult {
     };
     let latency = runner.latency.map_or(None, |l| Some(l.as_millis()));
     let reply = latency.map_or_else(
-        || "Pong! The shard latency is unavailable".to_string(),
-        |l| format!("Pong! The shard latency is `{}ms`.", l),
+        || "Pong! The shard latency is unavailable. The message latency is".to_string(),
+        |l| {
+            format!(
+                "Pong! The shard latency is `{}ms`. The message latency is",
+                l
+            )
+        },
     );
     let msg_latency_start = Instant::now();
     let mut msg = msg.channel_id.say(ctx, reply.clone()).await?;
     let msg_latency = msg_latency_start.elapsed();
-    let _ = msg.edit(&ctx, |m| m.content(format!("{} The message latency is `{}ms`.", reply, msg_latency.as_millis()))).await;
+    let _ = msg
+        .edit(&ctx, |m| {
+            m.content(format!("{} `{}ms`.", reply, msg_latency.as_millis()))
+        })
+        .await;
     Ok(())
 }

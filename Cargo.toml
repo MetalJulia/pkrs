@@ -26,3 +26,7 @@ sqlx = { version = "0.4.0-beta.1", default-features = false, features = [
 tokio = "0.2"
 serenity = "0.9.0"
 chrono = "0.4"
+openssl = { version = "0.10", optional = true }
+
+[features]
+vendored-openssl = ["openssl/vendored"]
